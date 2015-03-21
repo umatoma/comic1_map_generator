@@ -17,6 +17,8 @@ image = Image.new(IMAGE_WIDTH, IMAGE_HEIGHT) {
 }
 
 gc = Draw.new
+gc.fill('white')
+gc.stroke('black')
 
 layout_max_x = layouts.max_by { |layout| layout[:pos_x] }[:pos_x]
 layout_max_y = layouts.max_by { |layout| layout[:pos_y] }[:pos_y]
@@ -29,6 +31,17 @@ layouts.each do |layout|
   y2 = y1 + booth_h
   gc.rectangle(x1, y1, x2, y2)
 end
-
 gc.draw(image)
+
+layouts.each do |layout|
+  w = booth_w
+  h = booth_h
+  x = layout[:pos_x] * booth_w
+  y = layout[:pos_y] * booth_h
+  gc.annotate(image, w, h, x, y, layout[:space_no].to_s) do
+    self.gravity = CenterGravity
+    self.pointsize = 10
+  end
+end
+
 image.write(IMAGE_FILE_NAME)
