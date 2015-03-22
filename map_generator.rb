@@ -4,6 +4,7 @@ include Magick
 
 LAYOUTS_CSV_FILE_NAME = 'layouts.csv'
 BLOCKS_CSV_FILE_NAME = 'blocks.csv'
+EXPORT_CSV_FILE_NAME = 'export.csv'
 FONT_PATH = '/Library/Fonts/ヒラギノ丸ゴ Pro W4.otf'
 
 IMAGE_BACKGROUND_COLOR = 'white'
@@ -46,20 +47,33 @@ space_no_gc.pointsize = SPACE_NO_POINT_SIZE
 space_no_gc.font(FONT_PATH)
 space_no_gc.font = FONT_PATH
 
-layouts.each do |layout|
-  ## Draw circle booth frame
-  x1 = layout[:pos_x] * BOOTH_WIDTH
-  y1 = layout[:pos_y] * BOOTH_HEIGHT
-  x2 = x1 + BOOTH_WIDTH
-  y2 = y1 + BOOTH_HEIGHT
-  booths_gc.rectangle(x1, y1, x2, y2)
+## Export map data
+csv_str = CSV.generate do |csv|
+  csv << %w(space_no pos_x pos_y map_pos_x map_pos_y)
 
-  ## Draw circle booth space number
-  space_no = layout[:space_no].to_s
-  metrics = space_no_gc.get_type_metrics(space_no)
-  x = x1 + (BOOTH_WIDTH - metrics.width) * 0.5
-  y = y2 - (BOOTH_HEIGHT - SPACE_NO_POINT_SIZE) * 0.5
-  space_no_gc.text(x, y, space_no)
+  layouts.each do |layout|
+    ## Draw circle booth frame
+    x1 = layout[:pos_x] * BOOTH_WIDTH
+    y1 = layout[:pos_y] * BOOTH_HEIGHT
+    x2 = x1 + BOOTH_WIDTH
+    y2 = y1 + BOOTH_HEIGHT
+    booths_gc.rectangle(x1, y1, x2, y2)
+
+    ## Draw circle booth space number
+    space_no = layout[:space_no].to_s
+    metrics = space_no_gc.get_type_metrics(space_no)
+    x = x1 + (BOOTH_WIDTH - metrics.width) * 0.5
+    y = y2 - (BOOTH_HEIGHT - SPACE_NO_POINT_SIZE) * 0.5
+    space_no_gc.text(x, y, space_no)
+
+    csv << [
+      layout[:space_no],
+      layout[:pos_x],
+      layout[:pos_y],
+      IMAGE_MARGIN + x1,
+      IMAGE_MARGIN + y1
+    ]
+  end
 end
 
 block_gc = Draw.new
@@ -83,3 +97,5 @@ block_gc.draw(image)
 
 image_back.composite!(image, CenterGravity, OverCompositeOp)
 image_back.write(IMAGE_FILE_NAME)
+
+File.write(EXPORT_CSV_FILE_NAME, csv_str)
