@@ -4,28 +4,36 @@ include Magick
 
 LAYOUTS_CSV_FILE_NAME = 'layouts.csv'
 BLOCKS_CSV_FILE_NAME = 'blocks.csv'
+
 IMAGE_BACKGROUND_COLOR = 'white'
 IMAGE_FILE_NAME = 'image.png'
+IMAGE_MARGIN = 30
 
 BOOTH_WIDTH = 13
 BOOTH_HEIGHT = 13
 BOOTH_FILL = 'white'
 BOOTH_STROKE = 'black'
+BOOTH_STROKE_WIDTH = 1
 
 SPACE_NO_POINT_SIZE = 9
 
 layouts = CSV.table(LAYOUTS_CSV_FILE_NAME)
 blocks = CSV.table(BLOCKS_CSV_FILE_NAME)
 
-image_w = (layouts.map { |x| x[:pos_x] }.max + 1) * BOOTH_WIDTH
-image_h = (layouts.map { |x| x[:pos_y] }.max + 1) * BOOTH_HEIGHT
-image = Image.new(image_w, image_h) {
+image_w = (layouts.map { |x| x[:pos_x] }.max + 1) * BOOTH_WIDTH + BOOTH_STROKE_WIDTH
+image_h = (layouts.map { |x| x[:pos_y] }.max + 1) * BOOTH_HEIGHT + BOOTH_STROKE_WIDTH
+image = Image.new(image_w, image_h)
+
+image_back_w = image_w + IMAGE_MARGIN * 2
+image_back_h = image_h + IMAGE_MARGIN * 2
+image_back = Image.new(image_back_w, image_back_h) {
   self.background_color = IMAGE_BACKGROUND_COLOR
 }
 
 booths_gc = Draw.new
 booths_gc.fill(BOOTH_FILL)
 booths_gc.stroke(BOOTH_STROKE)
+booths_gc.stroke_width(BOOTH_STROKE_WIDTH)
 
 space_no_gc = Draw.new
 # Ruby - RMagickで描画される文字列のサイズを取得する方法 - Qiita
@@ -52,4 +60,5 @@ end
 booths_gc.draw(image)
 space_no_gc.draw(image)
 
-image.write(IMAGE_FILE_NAME)
+image_back.composite!(image, CenterGravity, OverCompositeOp)
+image_back.write(IMAGE_FILE_NAME)
