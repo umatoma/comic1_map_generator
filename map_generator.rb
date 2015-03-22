@@ -4,6 +4,7 @@ include Magick
 
 LAYOUTS_CSV_FILE_NAME = 'layouts.csv'
 BLOCKS_CSV_FILE_NAME = 'blocks.csv'
+FONT_PATH = '/Library/Fonts/ヒラギノ丸ゴ Pro W4.otf'
 
 IMAGE_BACKGROUND_COLOR = 'white'
 IMAGE_FILE_NAME = 'image.png'
@@ -16,6 +17,8 @@ BOOTH_STROKE = 'black'
 BOOTH_STROKE_WIDTH = 1
 
 SPACE_NO_POINT_SIZE = 9
+
+BLOCK_POINT_SIZE = 18
 
 layouts = CSV.table(LAYOUTS_CSV_FILE_NAME)
 blocks = CSV.table(BLOCKS_CSV_FILE_NAME)
@@ -40,6 +43,8 @@ space_no_gc = Draw.new
 # http://qiita.com/ykpaco_404wm/items/88a5bc55376ed913ffaf
 space_no_gc.pointsize(SPACE_NO_POINT_SIZE)
 space_no_gc.pointsize = SPACE_NO_POINT_SIZE
+space_no_gc.font(FONT_PATH)
+space_no_gc.font = FONT_PATH
 
 layouts.each do |layout|
   ## Draw circle booth frame
@@ -57,8 +62,24 @@ layouts.each do |layout|
   space_no_gc.text(x, y, space_no)
 end
 
+block_gc = Draw.new
+block_gc.pointsize(BLOCK_POINT_SIZE)
+block_gc.pointsize = BLOCK_POINT_SIZE
+block_gc.font(FONT_PATH)
+block_gc.font = FONT_PATH
+
+blocks.each do |block|
+  ## Draw block name
+  block_name = block[:name]
+  metrics = block_gc.get_type_metrics(block_name)
+  x = block[:pos_x] * BOOTH_WIDTH + (BOOTH_WIDTH * 2 - metrics.width) * 0.5
+  y = (block[:pos_y] + 2) * BOOTH_HEIGHT - (BOOTH_HEIGHT * 2 - SPACE_NO_POINT_SIZE) * 0.5
+  block_gc.text(x, y, block_name)
+end
+
 booths_gc.draw(image)
 space_no_gc.draw(image)
+block_gc.draw(image)
 
 image_back.composite!(image, CenterGravity, OverCompositeOp)
 image_back.write(IMAGE_FILE_NAME)
