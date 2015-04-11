@@ -2,9 +2,9 @@ require 'csv'
 require 'RMagick'
 include Magick
 
-LAYOUTS_CSV_FILE_NAME = 'layouts.csv'
-BLOCKS_CSV_FILE_NAME = 'blocks.csv'
-EXPORT_CSV_FILE_NAME = 'export.csv'
+LAYOUTS_CSV_FILE_NAME = 'layouts_8.csv'
+BLOCKS_CSV_FILE_NAME = 'blocks_8.csv'
+EXPORT_CSV_FILE_NAME = 'export_8.csv'
 FONT_PATH = '/Library/Fonts/ヒラギノ丸ゴ Pro W4.otf'
 
 IMAGE_BACKGROUND_COLOR = 'white'
